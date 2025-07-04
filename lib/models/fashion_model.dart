@@ -4,11 +4,10 @@ class FashionItem {
   final String brand;
   final double price;
   final String imagePath;
-  final String category;
   final List<String> colors;
   final List<String> sizes;
   final String description;
-  final int stock; // Tambahan stock
+  final int stock;
   bool isFavorite;
 
   FashionItem({
@@ -17,16 +16,14 @@ class FashionItem {
     required this.brand,
     required this.price,
     required this.imagePath,
-    required this.category,
     required this.colors,
     required this.sizes,
     required this.description,
-    required this.stock, // Tambahan stock
+    required this.stock,
     this.isFavorite = false,
   });
 }
 
-// Model untuk item di cart
 class CartItem {
   final String id;
   final String fashionItemId;
@@ -36,6 +33,7 @@ class CartItem {
   final String imagePath;
   final String selectedColor;
   final String selectedSize;
+  final String description;
   int quantity;
 
   CartItem({
@@ -47,6 +45,7 @@ class CartItem {
     required this.imagePath,
     required this.selectedColor,
     required this.selectedSize,
+    required this.description,
     this.quantity = 1,
   });
 

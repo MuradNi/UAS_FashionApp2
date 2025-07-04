@@ -10,6 +10,14 @@ class MainFashionScreen extends StatefulWidget {
 }
 
 class _MainFashionScreenState extends State<MainFashionScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +31,7 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
               SizedBox(height: 20),
               _buildHeader(),
               SizedBox(height: 30),
-              _buildCategoryFilter(),
+              _buildSearchBar(),
               SizedBox(height: 30),
               Expanded(
                 child: _buildFashionGrid(),
@@ -130,41 +138,59 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
     );
   }
 
-  Widget _buildCategoryFilter() {
+  Widget _buildSearchBar() {
     return Consumer<FashionProvider>(
       builder: (context, provider, child) {
         return Container(
-          height: 40,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: provider.categories.length,
-            itemBuilder: (context, index) {
-              final category = provider.categories[index];
-              final isSelected = category == provider.selectedCategory;
-
-              return GestureDetector(
-                onTap: () => provider.setCategory(category),
-                child: Container(
-                  margin: EdgeInsets.only(right: 16),
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.black : Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected ? Colors.black : Colors.grey[300]!,
-                    ),
-                  ),
-                  child: Text(
-                    category,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.grey[600],
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Icon(
+                  Icons.search,
+                  color: Colors.grey[500],
+                  size: 20,
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    provider.setSearchQuery(value);
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search fashion items...',
+                    hintStyle: TextStyle(
+                      color: Colors.grey[500],
                       fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ),
+              if (provider.searchQuery.isNotEmpty)
+                GestureDetector(
+                  onTap: () {
+                    _searchController.clear();
+                    provider.clearSearch();
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.grey[500],
+                      size: 20,
                     ),
                   ),
                 ),
-              );
-            },
+            ],
           ),
         );
       },
@@ -174,52 +200,59 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
   Widget _buildFashionGrid() {
     return Consumer<FashionProvider>(
       builder: (context, provider, child) {
-        final items = provider.filteredItems;
+        final filteredItems = provider.filteredItems;
 
-        if (items.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.shopping_bag_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'No items found',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  'Try selecting a different category',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
-            ),
-          );
+        if (filteredItems.isEmpty) {
+          return _buildEmptyState();
         }
 
         return GridView.builder(
+          padding: EdgeInsets.only(bottom: 20),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.7,
+            childAspectRatio: 0.75,
             crossAxisSpacing: 16,
-            mainAxisSpacing: 20,
+            mainAxisSpacing: 16,
           ),
-          itemCount: items.length,
+          itemCount: filteredItems.length,
           itemBuilder: (context, index) {
-            return FashionItemCard(item: items[index]);
+            final item = filteredItems[index];
+            return FashionItemCard(item: item);
           },
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off_outlined,
+            size: 80,
+            color: Colors.grey[400],
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No items found',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Try searching with different keywords',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[500],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
