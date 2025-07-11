@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'providers/fashion_provider.dart';
 import 'ui/screens/main_fashion_screen.dart';
-
+import 'ui/screens/login_screen.dart';
 void main() {
   runApp(MyApp());
 }

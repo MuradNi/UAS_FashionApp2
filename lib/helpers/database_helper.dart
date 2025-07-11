@@ -34,39 +34,49 @@ class DatabaseHelper {
       );
     }
   }
-  
+
   Future<void> _createDb(Database db, int version) async {
     try {
       print('Creating database tables...');
       await db.execute('''
-        CREATE TABLE items(
-          id TEXT PRIMARY KEY,
-          name TEXT,
-          brand TEXT,
-          price REAL,
-          imagePath TEXT,
-          category TEXT,
-          colors TEXT,
-          sizes TEXT,
-          description TEXT,
-          stock INTEGER,
-          isFavorite INTEGER
-        )
-      ''');
-      
+      CREATE TABLE items(
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        brand TEXT,
+        price REAL,
+        imagePath TEXT,
+        category TEXT,
+        colors TEXT,
+        sizes TEXT,
+        description TEXT,
+        stock INTEGER,
+        isFavorite INTEGER
+      )
+    ''');
+
       await db.execute('''
-        CREATE TABLE cart(
-          id TEXT PRIMARY KEY,
-          fashionItemId TEXT,
-          name TEXT,
-          brand TEXT,
-          price REAL,
-          imagePath TEXT,
-          selectedColor TEXT,
-          selectedSize TEXT,
-          quantity INTEGER
-        )
-      ''');
+      CREATE TABLE cart(
+        id TEXT PRIMARY KEY,
+        fashionItemId TEXT,
+        name TEXT,
+        brand TEXT,
+        price REAL,
+        imagePath TEXT,
+        selectedColor TEXT,
+        selectedSize TEXT,
+        quantity INTEGER
+      )
+    ''');
+
+      // Add this new table for users
+      await db.execute('''
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT
+      )
+    ''');
+
     } catch (e) {
       print('Error creating database tables: $e');
     }
@@ -147,4 +157,30 @@ class DatabaseHelper {
     final db = await database;
     return await db.delete('cart');
   }
-}
+
+  Future<int> registerUser(String username, String password) async {
+    final db = await database;
+    try {
+      return await db.insert('users', {
+        'username': username,
+        'password': password,
+      });
+    } catch (e) {
+      print("Registration error: $e");
+      return -1; // Username might already exist
+    }
+  }
+
+// Authenticate user login
+  Future<bool> loginUser(String username, String password) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'username = ? AND password = ?',
+      whereArgs: [username, password],
+    );
+
+    return result.isNotEmpty;
+  }
+
+
