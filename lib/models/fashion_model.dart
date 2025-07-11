@@ -104,15 +104,15 @@ class CartItem {
   // Membuat CartItem dari Map SQLite
   factory CartItem.fromMap(Map<String, dynamic> map) {
     return CartItem(
-      id: map['id'] as String,
-      fashionItemId: map['fashionItemId'] as String,
-      name: map['name'] as String,
-      brand: map['brand'] as String,
-      price: map['price'] is int ? (map['price'] as int).toDouble() : map['price'] as double,
-      imagePath: map['imagePath'] as String,
-      selectedColor: map['selectedColor'] as String,
-      selectedSize: map['selectedSize'] as String,
-      quantity: map['quantity'] as int,
+      id: map['id'],
+      fashionItemId: map['fashionItemId'],
+      name: map['name'],
+      brand: map['brand'],
+      price: map['price'],
+      imagePath: map['imagePath'],
+      selectedColor: map['selectedColor'],
+      selectedSize: map['selectedSize'],
+      quantity: map['quantity'],
     );
   }
 }

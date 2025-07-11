@@ -61,13 +61,12 @@ class DatabaseHelper {
           name TEXT,
           brand TEXT,
           price REAL,
-        imagePath TEXT,
-        selectedColor TEXT,
-        selectedSize TEXT,
-        quantity INTEGER
-      )
-    ''');
-      print('Database tables created successfully');
+          imagePath TEXT,
+          selectedColor TEXT,
+          selectedSize TEXT,
+          quantity INTEGER
+        )
+      ''');
     } catch (e) {
       print('Error creating database tables: $e');
     }

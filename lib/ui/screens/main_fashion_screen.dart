@@ -180,13 +180,6 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
   Widget _buildFashionGrid() {
     return Consumer<FashionProvider>(
       builder: (context, provider, child) {
-        // Tampilkan loading indicator jika data belum dimuat
-        if (!provider.isLoaded) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        
         final items = provider.filteredItems;
 
         if (items.isEmpty) {
@@ -242,7 +235,7 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
     final priceController = TextEditingController();
     final descriptionController = TextEditingController();
     final stockController = TextEditingController();
-    final imagePathController = TextEditingController(text: 'assets/images/placeholder.png');
+    final imagePathController = TextEditingController(text: 'https://via.placeholder.com/300');
     
     String selectedCategory = 'Tops';
     List<String> colors = [];
@@ -251,6 +244,12 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
     final availableCategories = Provider.of<FashionProvider>(context, listen: false).categories;
     final availableColors = ['White', 'Black', 'Grey', 'Navy', 'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Pink', 'Orange', 'Brown', 'Beige', 'Charcoal'];
     final availableSizes = ['XS', 'S', 'M', 'L', 'XL', '24', '26', '28', '30', '32'];
+    
+    // Fungsi untuk validasi URL
+    bool isValidUrl(String url) {
+      Uri? uri = Uri.tryParse(url);
+      return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+    }
     
     showDialog(
       context: context,
@@ -285,6 +284,14 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
                     controller: stockController,
                     decoration: InputDecoration(labelText: 'Stock'),
                     keyboardType: TextInputType.number,
+                  ),
+                  TextField(
+                    controller: imagePathController,
+                    decoration: InputDecoration(
+                      labelText: 'Image URL',
+                      hintText: 'Enter a valid image URL (http/https)',
+                    ),
+                    keyboardType: TextInputType.url,
                   ),
                   SizedBox(height: 16),
                   
@@ -370,6 +377,14 @@ class _MainFashionScreenState extends State<MainFashionScreen> {
                       sizes.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Please fill all required fields')),
+                    );
+                    return;
+                  }
+                  
+                  // Validasi URL gambar
+                  if (!isValidUrl(imagePathController.text)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Please enter a valid image URL (http/https)')),
                     );
                     return;
                   }
